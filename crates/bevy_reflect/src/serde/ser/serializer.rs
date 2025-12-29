@@ -257,13 +257,6 @@ impl<P: ReflectSerializerProcessor> Serialize for TypedReflectSerializer<'_, P> 
             serializer
         };
 
-        // Handle both Value case and types that have a custom `Serialize`
-        let (serializer, error) = match try_custom_serialize(self.value, self.registry, serializer)
-        {
-            Ok(result) => return result,
-            Err(value) => value,
-        };
-
         let output = match self.value.reflect_ref() {
             ReflectRef::Struct(struct_value) => StructSerializer {
                 struct_value,
@@ -315,7 +308,14 @@ impl<P: ReflectSerializerProcessor> Serialize for TypedReflectSerializer<'_, P> 
             .serialize(serializer),
             #[cfg(feature = "functions")]
             ReflectRef::Function(_) => Err(make_custom_error("functions cannot be serialized")),
-            ReflectRef::Opaque(_) => Err(error),
+            ReflectRef::Opaque(value) => {
+                // Handle both Value case and types that have a custom `Serialize`
+                match try_custom_serialize(value, self.registry, serializer) {
+                    Ok(Ok(value)) => Ok(value),
+                    Ok(Err(serializer)) => Err(serializer),
+                    Err((serializer, error)) => Err(error),
+                }
+            }
         };
 
         #[cfg(feature = "debug_stack")]
