@@ -375,20 +375,7 @@ impl<'de, P: ReflectDeserializerProcessor> DeserializeSeed<'de>
                 deserializer
             };
 
-            let type_path = self.registration.type_info().type_path();
-
-            // Handle both Value case and types that have a custom `ReflectDeserialize`
-            if let Some(deserialize_reflect) = self.registration.data::<ReflectDeserialize>() {
-                let value = deserialize_reflect.deserialize(deserializer)?;
-                return Ok(value.into_partial_reflect());
-            }
-
-            if let Some(deserialize_reflect) =
-                self.registration.data::<ReflectDeserializeWithRegistry>()
-            {
-                let value = deserialize_reflect.deserialize(deserializer, self.registry)?;
-                return Ok(value);
-            }
+            let type_path = self.registration.type_info().type_path();            
 
             let dynamic_value: Box<dyn PartialReflect> = match self.registration.type_info() {
                 TypeInfo::Struct(struct_info) => {
@@ -510,11 +497,23 @@ impl<'de, P: ReflectDeserializerProcessor> DeserializeSeed<'de>
                     dynamic_enum.set_represented_type(Some(self.registration.type_info()));
                     Box::new(dynamic_enum)
                 }
-                TypeInfo::Opaque(_) => {
-                    // This case should already be handled
-                    return Err(make_custom_error(format_args!(
-                        "type `{type_path}` did not register the `ReflectDeserialize` type data. For certain types, this may need to be registered manually using `register_type_data`",
-                    )));
+                TypeInfo::Opaque(info) => {
+                    if let Some(deserialize_reflect) =
+                        self.registration.data::<ReflectDeserialize>()
+                    {
+                        deserialize_reflect
+                            .deserialize(deserializer)
+                            .map(|value| value.into_partial_reflect())?
+                    } else if let Some(deserialize_reflect) =
+                        self.registration.data::<ReflectDeserializeWithRegistry>()
+                    {
+                        deserialize_reflect.deserialize(deserializer, self.registry)?
+                    } else {
+                        return Err(make_custom_error(format_args!(
+                            "type `{}` did not register the `ReflectDeserialize` type data. For certain types, this may need to be registered manually using `register_type_data`.",
+                            info.type_path(),
+                        )));
+                    }
                 }
             };
 

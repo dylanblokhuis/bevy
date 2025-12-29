@@ -23,12 +23,18 @@ fn main() {
 pub struct Player {
     name: String,
     health: u32,
+    translation: Vec3,
 }
 
 const PLAYER_JSON: &str = r#"{
     "serialization::Player": {
         "name": "BevyPlayerOne",
-        "health": 50
+        "health": 50,
+        "translation": {
+            "x": 1.0,
+            "y": 2.0,
+            "z": 3.0
+        }
     }
 }"#;
 
@@ -55,6 +61,7 @@ fn serialize(type_registry: Res<AppTypeRegistry>) {
     let value = Player {
         name: "BevyPlayerSerialize".to_string(),
         health: 80,
+        translation: Vec3::new(1.0, 2.0, 3.0),
     };
 
     // By default, all derived `Reflect` types can be serialized using serde. No need to derive
