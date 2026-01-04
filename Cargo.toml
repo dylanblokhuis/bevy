@@ -310,7 +310,7 @@ bevy_post_process = ["bevy_internal/bevy_post_process"]
 bevy_anti_alias = ["bevy_internal/bevy_anti_alias"]
 
 # Adds gamepad support
-bevy_gilrs = ["bevy_internal/bevy_gilrs"]
+bevy_gilrs = ["gamepad", "bevy_internal/bevy_gilrs"]
 
 # [glTF](https://www.khronos.org/gltf/) support
 bevy_gltf = ["bevy_internal/bevy_gltf"]
@@ -3316,6 +3316,17 @@ category = "Stress Tests"
 wasm = true
 
 [[example]]
+name = "bevymark_3d"
+path = "examples/stress_tests/bevymark_3d.rs"
+doc-scrape-examples = true
+
+[package.metadata.example.bevymark_3d]
+name = "Bevymark 3D"
+description = "A heavy 3D cube rendering workload to benchmark your system with Bevy"
+category = "Stress Tests"
+wasm = true
+
+[[example]]
 name = "many_animated_sprites"
 path = "examples/stress_tests/many_animated_sprites.rs"
 # Causes an ICE on docs.rs
@@ -3674,6 +3685,17 @@ doc-scrape-examples = true
 [package.metadata.example.ui_drag_and_drop]
 name = "UI Drag and Drop"
 description = "Demonstrates dragging and dropping UI nodes"
+category = "UI (User Interface)"
+wasm = true
+
+[[example]]
+name = "font_query"
+path = "examples/ui/font_query.rs"
+doc-scrape-examples = true
+
+[package.metadata.example.font_query]
+name = "Font Queries"
+description = "Demonstrates font querying"
 category = "UI (User Interface)"
 wasm = true
 
@@ -4855,6 +4877,18 @@ category = "Picking"
 wasm = true
 
 [[example]]
+name = "dragdrop_picking"
+path = "examples/picking/dragdrop_picking.rs"
+doc-scrape-examples = true
+required-features = ["mesh_picking"]
+
+[package.metadata.example.dragdrop_picking]
+name = "Drag and Drop"
+description = "Demonstrates drag and drop using picking events"
+category = "Picking"
+wasm = true
+
+[[example]]
 name = "animation_masks"
 path = "examples/animation/animation_masks.rs"
 # Causes an ICE on docs.rs
@@ -5254,3 +5288,14 @@ name = "Mirror"
 description = "Demonstrates how to create a mirror with a second camera"
 category = "3D Rendering"
 wasm = true
+
+[[example]]
+name = "dynamic_mip_generation"
+path = "examples/2d/dynamic_mip_generation.rs"
+doc-scrape-examples = true
+
+[package.metadata.example.dynamic_mip_generation]
+name = "Dynamic Mipmap Generation"
+description = "Demonstrates use of the mipmap generation plugin to generate mipmaps for a texture"
+category = "2D Rendering"
+wasm = false
